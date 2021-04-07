@@ -5,11 +5,27 @@
   // Use the jQuery document ready signal to know when everything has been initialized
   $(document).ready(function() {
     tableau.extensions.initializeAsync({'configure': showChooseSheetDialog}).then(function() {
-      $("#test").append("I have initialized!");
+      showChooseSheetDialog();
     });
 
     function showChooseSheetDialog() {
-      $("#test").append("<br>Choose Sheet");
+      const dashboardName = tableau.extensions.dashboardContent.dashboard.name;
+      const worksheets = tableau.extensions.dashboardContent.dashboard.worksheets;
+    
+      const worksheetNames = worksheets.map((worksheet) => {
+        return worksheet.name;
+      });
+      demoHelpers.showDialog(dashboardName, worksheetNames, loadSelectedMarks);
+    }
+
+
+    function loadSelectedMarks(worksheetName) {
+      $('#selected_marks_title').text(worksheetName);
+      const worksheet = demoHelpers.getSelectedSheet(worksheetName);
+    
+      worksheet.getSelectedMarksAsync().then((marks) => {
+          demoHelpers.populateDataTable(marks);
+      });
     }
     
   });
